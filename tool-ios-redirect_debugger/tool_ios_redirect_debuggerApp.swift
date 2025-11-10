@@ -11,7 +11,7 @@ import SwiftUI
 struct tool_ios_redirect_debuggerApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            URLFetcherView()
         }
     }
 }
