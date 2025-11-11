@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B4751DF12EC3790200B4F8D8 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4751DF02EC3790200B4F8D8 /* StoreKit.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		B4751DD12EC240DC00B4F8D8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		B4751DC32EC240DA00B4F8D8 /* tool-ios-redirect_debugger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "tool-ios-redirect_debugger.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4751DD02EC240DC00B4F8D8 /* tool-ios-redirect_debuggerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "tool-ios-redirect_debuggerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4751DDA2EC240DC00B4F8D8 /* tool-ios-redirect_debuggerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "tool-ios-redirect_debuggerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B4751DF02EC3790200B4F8D8 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B4751DF12EC3790200B4F8D8 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +84,7 @@
 				B4751DC52EC240DA00B4F8D8 /* tool-ios-redirect_debugger */,
 				B4751DD32EC240DC00B4F8D8 /* tool-ios-redirect_debuggerTests */,
 				B4751DDD2EC240DC00B4F8D8 /* tool-ios-redirect_debuggerUITests */,
+				B4751DEF2EC3790200B4F8D8 /* Frameworks */,
 				B4751DC42EC240DA00B4F8D8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +97,14 @@
 				B4751DDA2EC240DC00B4F8D8 /* tool-ios-redirect_debuggerUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B4751DEF2EC3790200B4F8D8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B4751DF02EC3790200B4F8D8 /* StoreKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -395,6 +410,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7F2B5ZSP8Q;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "tool-ios-redirect-debugger-Info.plist";
@@ -408,7 +424,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.vonage.tool-ios-redirect-debugger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -428,6 +444,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7F2B5ZSP8Q;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "tool-ios-redirect-debugger-Info.plist";
@@ -441,7 +458,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.vonage.tool-ios-redirect-debugger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
