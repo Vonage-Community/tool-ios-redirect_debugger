@@ -1,9 +1,11 @@
 import SwiftUI
+import VonageClientLibrary
 
 struct URLFetcherView: View {
     @State private var urlText: String = ""
     @State private var debugInfo: String = ""
     @State private var showShareSheet = false
+    @State private var useVonageClient = false
     
     var body: some View {
         VStack(spacing: 16) {
@@ -16,6 +18,10 @@ struct URLFetcherView: View {
                     .textFieldStyle(.roundedBorder)
                     .autocapitalization(.none)
                     .autocorrectionDisabled()
+                
+                // Toggle for Vonage Client Library
+                Toggle("Use Vonage Client Library (1.0.2)", isOn: $useVonageClient)
+                    .padding(.top, 8)
                 
                 Button(action: {
                     fetchURL()
@@ -76,8 +82,94 @@ struct URLFetcherView: View {
             return
         }
         
-        debugInfo = "Starting fetch...\n\n"
+        debugInfo = "Starting fetch...\n"
+        debugInfo += "Using Vonage Client Library: \(useVonageClient ? "Yes" : "No")\n\n"
         
+        if useVonageClient {
+            fetchURLWithVonage(url: url)
+        } else {
+            fetchURLWithStandardClient(url: url)
+        }
+    }
+    
+    func fetchURLWithVonage(url: URL) {
+        debugInfo += "========== VONAGE CLIENT REQUEST ==========\n"
+        debugInfo += "URL: \(url.absoluteString)\n"
+        debugInfo += "Method: GET (Cellular)\n"
+        debugInfo += "Max Redirect Count: 10\n"
+        debugInfo += "Debug Mode: Enabled\n\n"
+        
+        let client = VGCellularRequestClient()
+        let params = VGCellularRequestParameters(
+            url: url.absoluteString,
+            headers: [:],
+            queryParameters: [:],
+            maxRedirectCount: 10
+        )
+        
+        Task {
+            do {
+                let response = try await client.startCellularGetRequest(params: params, debug: true)
+                
+                DispatchQueue.main.async {
+                    self.debugInfo += "========== VONAGE CLIENT RESPONSE ==========\n"
+                    
+                    // Parse and display the response
+                    if let responseDict = response as? [String: Any] {
+                        // Display HTTP Status
+                        if let httpStatus = responseDict["http_status"] as? String {
+                            self.debugInfo += "HTTP Status: \(httpStatus)\n"
+                        }
+                        
+                        // Display Response Body
+                        if let responseBody = responseDict["response_body"] {
+                            self.debugInfo += "\nResponse Body:\n"
+                            if let bodyDict = responseBody as? [String: Any] {
+                                self.debugInfo += self.formatJSON(bodyDict, indent: 2)
+                            } else {
+                                self.debugInfo += "\(responseBody)\n"
+                            }
+                        }
+                        
+                        // Display Debug Information
+                        if let debugInfo = responseDict["debug"] as? [String: Any] {
+                            self.debugInfo += "\n========== DEBUG INFORMATION ==========\n"
+                            
+                            if let deviceInfo = debugInfo["device_info"] as? String {
+                                self.debugInfo += "Device Info:\n\(deviceInfo)\n\n"
+                            }
+                            
+                            if let urlTrace = debugInfo["url_trace"] as? String {
+                                self.debugInfo += "URL Trace:\n\(urlTrace)\n"
+                            }
+                        }
+                        
+                        // Display Error if present
+                        if let error = responseDict["error"] as? String {
+                            self.debugInfo += "\n========== ERROR ==========\n"
+                            self.debugInfo += "Error: \(error)\n"
+                            
+                            if let errorDescription = responseDict["error_description"] as? String {
+                                self.debugInfo += "Description: \(errorDescription)\n"
+                            }
+                        }
+                    } else {
+                        self.debugInfo += "Raw Response:\n\(response)\n"
+                    }
+                    
+                    self.debugInfo += "\n========== FETCH COMPLETE ==========\n"
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.debugInfo += "========== ERROR ==========\n"
+                    self.debugInfo += "Error: \(error.localizedDescription)\n"
+                    self.debugInfo += "\n========== FETCH FAILED ==========\n"
+                }
+            }
+        }
+    }
+    
+    func fetchURLWithStandardClient(url: URL) {
         // Create a custom URL session with delegate to handle redirects
         let config = URLSessionConfiguration.default
         let delegate = RedirectHandlerDelegate(debugInfoHandler: { [self] info in
@@ -114,6 +206,26 @@ struct URLFetcherView: View {
         }
         
         task.resume()
+    }
+    
+    func formatJSON(_ dict: [String: Any], indent: Int = 0) -> String {
+        var result = ""
+        let indentStr = String(repeating: " ", count: indent)
+        
+        for (key, value) in dict.sorted(by: { $0.key < $1.key }) {
+            result += "\(indentStr)\(key): "
+            
+            if let nestedDict = value as? [String: Any] {
+                result += "\n"
+                result += formatJSON(nestedDict, indent: indent + 2)
+            } else if let array = value as? [Any] {
+                result += "\(array)\n"
+            } else {
+                result += "\(value)\n"
+            }
+        }
+        
+        return result
     }
     
     func logRequest(_ request: URLRequest, requestNumber: Int) {
@@ -169,6 +281,7 @@ struct URLFetcherView: View {
 }
 
 // Delegate to handle redirects and certificate validation
+// Delegate to handle redirects and certificate validation
 class RedirectHandlerDelegate: NSObject, URLSessionTaskDelegate {
     var requestCount = 1
     var debugInfoHandler: (String) -> Void
@@ -177,7 +290,7 @@ class RedirectHandlerDelegate: NSObject, URLSessionTaskDelegate {
         self.debugInfoHandler = debugInfoHandler
     }
     
-    // This method intercepts redirects
+    // This method intercepts redirects - CORRECTED SIGNATURE
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
         
         requestCount += 1

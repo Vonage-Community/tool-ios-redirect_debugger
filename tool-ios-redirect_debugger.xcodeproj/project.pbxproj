@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B4751DF12EC3790200B4F8D8 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4751DF02EC3790200B4F8D8 /* StoreKit.framework */; };
+		B4E58AA82EC38CC7004108DE /* VonageClientLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = B4E58AA72EC38CC7004108DE /* VonageClientLibrary */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B4751DF12EC3790200B4F8D8 /* StoreKit.framework in Frameworks */,
+				B4E58AA82EC38CC7004108DE /* VonageClientLibrary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,6 +129,7 @@
 			);
 			name = "tool-ios-redirect_debugger";
 			packageProductDependencies = (
+				B4E58AA72EC38CC7004108DE /* VonageClientLibrary */,
 			);
 			productName = "tool-ios-redirect_debugger";
 			productReference = B4751DC32EC240DA00B4F8D8 /* tool-ios-redirect_debugger.app */;
@@ -210,6 +213,9 @@
 			);
 			mainGroup = B4751DBA2EC240DA00B4F8D8;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B4E58AA62EC38CC7004108DE /* XCRemoteSwiftPackageReference "vonage-ios-client-library" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B4751DC42EC240DA00B4F8D8 /* Products */;
 			projectDirPath = "";
@@ -424,7 +430,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.vonage.tool-ios-redirect-debugger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -458,7 +464,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.vonage.tool-ios-redirect-debugger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -591,6 +597,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B4E58AA62EC38CC7004108DE /* XCRemoteSwiftPackageReference "vonage-ios-client-library" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Vonage/vonage-ios-client-library.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B4E58AA72EC38CC7004108DE /* VonageClientLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B4E58AA62EC38CC7004108DE /* XCRemoteSwiftPackageReference "vonage-ios-client-library" */;
+			productName = VonageClientLibrary;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B4751DBB2EC240DA00B4F8D8 /* Project object */;
 }
