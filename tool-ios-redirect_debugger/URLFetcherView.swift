@@ -6,6 +6,7 @@ struct URLFetcherView: View {
     @State private var debugInfo: String = ""
     @State private var showShareSheet = false
     @State private var useVonageClient = false
+    @State private var customHeaders: [(key: String, value: String)] = []
     
     var body: some View {
         VStack(spacing: 16) {
@@ -20,8 +21,60 @@ struct URLFetcherView: View {
                     .autocorrectionDisabled()
                 
                 // Toggle for Vonage Client Library
-                Toggle("Use Vonage Client Library (1.0.2)", isOn: $useVonageClient)
+                Toggle("Use Vonage Client Library", isOn: $useVonageClient)
                     .padding(.top, 8)
+                
+                // Custom Headers Section (only visible when Vonage is enabled)
+                if useVonageClient {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Custom Headers:")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                customHeaders.append((key: "", value: ""))
+                            }) {
+                                Image(systemName: "plus.circle.fill")
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        .padding(.top, 8)
+                        
+                        if customHeaders.isEmpty {
+                            Text("No custom headers added")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                                .padding(.vertical, 4)
+                        } else {
+                            ForEach(customHeaders.indices, id: \.self) { index in
+                                HStack(spacing: 8) {
+                                    TextField("Header Key", text: $customHeaders[index].key)
+                                        .textFieldStyle(.roundedBorder)
+                                        .autocapitalization(.none)
+                                        .autocorrectionDisabled()
+                                    
+                                    TextField("Header Value", text: $customHeaders[index].value)
+                                        .textFieldStyle(.roundedBorder)
+                                        .autocapitalization(.none)
+                                        .autocorrectionDisabled()
+                                    
+                                    Button(action: {
+                                        customHeaders.remove(at: index)
+                                    }) {
+                                        Image(systemName: "trash.circle.fill")
+                                            .foregroundColor(.red)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(12)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(8)
+                }
                 
                 Button(action: {
                     fetchURL()
@@ -97,12 +150,26 @@ struct URLFetcherView: View {
         debugInfo += "URL: \(url.absoluteString)\n"
         debugInfo += "Method: GET (Cellular)\n"
         debugInfo += "Max Redirect Count: 10\n"
-        debugInfo += "Debug Mode: Enabled\n\n"
+        debugInfo += "Debug Mode: Enabled\n"
+        
+        // Convert custom headers array to dictionary
+        var headersDict: [String: String] = [:]
+        for header in customHeaders where !header.key.isEmpty {
+            headersDict[header.key] = header.value
+        }
+        
+        if !headersDict.isEmpty {
+            debugInfo += "\nCustom Headers:\n"
+            for (key, value) in headersDict.sorted(by: { $0.key < $1.key }) {
+                debugInfo += "  \(key): \(value)\n"
+            }
+        }
+        debugInfo += "\n"
         
         let client = VGCellularRequestClient()
         let params = VGCellularRequestParameters(
             url: url.absoluteString,
-            headers: [:],
+            headers: headersDict,
             queryParameters: [:],
             maxRedirectCount: 10
         )
@@ -281,7 +348,6 @@ struct URLFetcherView: View {
 }
 
 // Delegate to handle redirects and certificate validation
-// Delegate to handle redirects and certificate validation
 class RedirectHandlerDelegate: NSObject, URLSessionTaskDelegate {
     var requestCount = 1
     var debugInfoHandler: (String) -> Void
@@ -290,7 +356,7 @@ class RedirectHandlerDelegate: NSObject, URLSessionTaskDelegate {
         self.debugInfoHandler = debugInfoHandler
     }
     
-    // This method intercepts redirects - CORRECTED SIGNATURE
+    // This method intercepts redirects
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
         
         requestCount += 1
