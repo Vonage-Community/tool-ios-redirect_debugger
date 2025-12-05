@@ -430,7 +430,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.vonage.tool-ios-redirect-debugger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -464,7 +464,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.vonage.tool-ios-redirect-debugger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -603,8 +603,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Vonage/vonage-ios-client-library.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.2;
+				kind = exactVersion;
+				version = "1.0.3-beta1";
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
