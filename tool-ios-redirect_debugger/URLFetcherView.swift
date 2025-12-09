@@ -6,6 +6,7 @@ struct URLFetcherView: View {
     @State private var debugInfo: String = ""
     @State private var showShareSheet = false
     @State private var useVonageClient = false
+    @State private var showResponseBody = false
     @State private var customHeaders: [(key: String, value: String)] = []
     
     var body: some View {
@@ -22,6 +23,10 @@ struct URLFetcherView: View {
                 
                 // Toggle for Vonage Client Library
                 Toggle("Use Vonage Client Library", isOn: $useVonageClient)
+                    .padding(.top, 8)
+                
+                // Toggle for showing response body
+                Toggle("Show Response Body", isOn: $showResponseBody)
                     .padding(.top, 8)
                 
                 // Custom Headers Section (only visible when Vonage is enabled)
@@ -136,7 +141,8 @@ struct URLFetcherView: View {
         }
         
         debugInfo = "Starting fetch...\n"
-        debugInfo += "Using Vonage Client Library: \(useVonageClient ? "Yes" : "No")\n\n"
+        debugInfo += "Using Vonage Client Library: \(useVonageClient ? "Yes" : "No")\n"
+        debugInfo += "Show Response Body: \(showResponseBody ? "Yes" : "No")\n\n"
         
         if useVonageClient {
             fetchURLWithVonage(url: url)
@@ -188,13 +194,17 @@ struct URLFetcherView: View {
                             self.debugInfo += "HTTP Status: \(httpStatus)\n"
                         }
                         
-                        // Display Response Body
-                        if let responseBody = responseDict["response_body"] {
-                            self.debugInfo += "\nResponse Body:\n"
-                            if let bodyDict = responseBody as? [String: Any] {
-                                self.debugInfo += self.formatJSON(bodyDict, indent: 2)
-                            } else {
-                                self.debugInfo += "\(responseBody)\n"
+                        // Display Response Body if toggle is enabled
+                        if self.showResponseBody {
+                            if let responseBody = responseDict["response_body"] {
+                                self.debugInfo += "\nResponse Body:\n"
+                                if let bodyDict = responseBody as? [String: Any] {
+                                    self.debugInfo += self.formatJSON(bodyDict, indent: 2)
+                                } else if let bodyString = responseBody as? String {
+                                    self.debugInfo += "\(bodyString)\n"
+                                } else {
+                                    self.debugInfo += "\(responseBody)\n"
+                                }
                             }
                         }
                         
@@ -239,11 +249,14 @@ struct URLFetcherView: View {
     func fetchURLWithStandardClient(url: URL) {
         // Create a custom URL session with delegate to handle redirects
         let config = URLSessionConfiguration.default
-        let delegate = RedirectHandlerDelegate(debugInfoHandler: { [self] info in
-            DispatchQueue.main.async {
-                self.debugInfo += info
+        let delegate = RedirectHandlerDelegate(
+            showResponseBody: showResponseBody,
+            debugInfoHandler: { [self] info in
+                DispatchQueue.main.async {
+                    self.debugInfo += info
+                }
             }
-        })
+        )
         let session = URLSession(configuration: config, delegate: delegate, delegateQueue: nil)
         
         var request = URLRequest(url: url)
@@ -322,6 +335,23 @@ struct URLFetcherView: View {
         
         if let data = data {
             debugInfo += "\nResponse Body Size: \(data.count) bytes\n"
+            
+            // Show response body if toggle is enabled and not a redirect
+            if showResponseBody && !(300...399).contains(response.statusCode) {
+                debugInfo += "\nResponse Body:\n"
+                if let bodyString = String(data: data, encoding: .utf8) {
+                    // Limit body output to avoid overwhelming the display
+                    let maxLength = 5000
+                    if bodyString.count > maxLength {
+                        debugInfo += String(bodyString.prefix(maxLength))
+                        debugInfo += "\n... (truncated, showing first \(maxLength) characters of \(bodyString.count))\n"
+                    } else {
+                        debugInfo += bodyString + "\n"
+                    }
+                } else {
+                    debugInfo += "(Binary data, cannot display as text)\n"
+                }
+            }
         }
         debugInfo += "\n"
     }
@@ -350,9 +380,11 @@ struct URLFetcherView: View {
 // Delegate to handle redirects and certificate validation
 class RedirectHandlerDelegate: NSObject, URLSessionTaskDelegate {
     var requestCount = 1
+    var showResponseBody: Bool
     var debugInfoHandler: (String) -> Void
     
-    init(debugInfoHandler: @escaping (String) -> Void) {
+    init(showResponseBody: Bool, debugInfoHandler: @escaping (String) -> Void) {
+        self.showResponseBody = showResponseBody
         self.debugInfoHandler = debugInfoHandler
     }
     
